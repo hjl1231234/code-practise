@@ -1,6 +1,2 @@
 # code-practise
 portfolio
-
-
-
-leetcode
