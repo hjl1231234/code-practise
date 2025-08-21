@@ -1,15 +1,11 @@
-package main
+package array
 
 import (
-	"fmt"
 	"strconv"
 )
 
-func main() {
-	fmt.Println(isPalindrome(12321))
-}
-
-func isPalindrome(x int) bool {
+// leetcode 9 回文数
+func IsPalindrome(x int) bool {
 	if x < 0 {
 		return false
 	}

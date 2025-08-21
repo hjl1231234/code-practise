@@ -1,13 +1,7 @@
-package main
-
-import "fmt"
-
-func main() {
-	fmt.Println(isPalindrome(12321))
-}
+package math
 
 // leetcode 9 回文数
-func isPalindrome(x int) bool {
+func IsPalindrome(x int) bool {
 	if x < 0 || (x%10 == 0 && x != 0) {
 		return false
 	}

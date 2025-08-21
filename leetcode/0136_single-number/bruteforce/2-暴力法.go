@@ -1,14 +1,7 @@
-package main
+package bruteforce
 
-import "fmt"
-
-func main() {
-	//arr := []int{4, 1, 2, 1, 2}
-	arr := []int{2, 2, 1}
-	fmt.Println(singleNumber(arr))
-}
-
-func singleNumber(nums []int) int {
+// SingleNumber 使用暴力方法找出只出现一次的数字
+func SingleNumber(nums []int) int {
 	for i := 0; i < len(nums); i++ {
 		flag := false
 		for j := 0; j < len(nums); j++ {
@@ -20,7 +13,6 @@ func singleNumber(nums []int) int {
 		if flag == false {
 			return nums[i]
 		}
-
 	}
-	return -1
+	return 0 // 保证函数总是有返回值
 }
