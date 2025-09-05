@@ -1,0 +1,92 @@
+
+
+# 自定义网络：让所有服务在同一网络内通信（避免暴露不必要的端口到宿主机）
+networks:
+  app-network:
+    driver: bridge
+
+# 数据卷：持久化所有服务的数据（容器删除后数据不丢失）
+volumes:
+  postgres_data:  # 项目1的数据卷
+  mysql5-data:  # MySQL 5 数据卷
+  redis_data:          # Redis数据卷
+
+
+services:
+  postgres:
+    image: postgres:13  # 版本从 17 改为 13
+    container_name: postgres-13
+    environment:
+      POSTGRES_USER: postgres  # 数据库用户名（与旧版本保持一致）
+      POSTGRES_PASSWORD: pwd  # 密码（与旧版本保持一致）
+      POSTGRES_DB: test_db  # 数据库名（与旧版本保持一致）
+    ports:
+      - "5432:5432"  # 端口映射（保持不变）
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # 数据卷（保持不变，用于持久化数据）
+    restart: unless-stopped
+    networks:
+      - app-network  # 自定义网络（方便其他服务连接）
+    healthcheck:
+      # 健康检查：验证数据库是否可连接
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  mysql5:
+    # 使用 MySQL 5 系列最新版本（5.7 分支）
+    image: mysql:5.7
+    container_name: mysql5-service
+    restart: always  # 容器退出时自动重启
+    environment:
+      # 必要环境变量（根据需求修改）
+      MYSQL_ROOT_PASSWORD: test123  # root 用户密码
+      MYSQL_DATABASE: my_db  # 初始化时创建的数据库名
+      MYSQL_USER: test  # 自定义用户
+      MYSQL_PASSWORD: test123  # 自定义用户密码
+      # MySQL 5.7 字符集配置（避免中文乱码）
+      MYSQL_INITDB_SKIP_TZINFO: "1"  # 跳过时区初始化（可选）
+    ports:
+      - "3306:3306"  # 端口映射（宿主机:容器）
+    volumes:
+      # 数据持久化（named volume，避免容器删除后数据丢失）
+      - mysql5-data:/var/lib/mysql
+      # 挂载自定义配置文件（可选，如需覆盖默认配置）
+      - ./mysql-conf:/etc/mysql/conf.d
+    networks:
+      - app-network  # 自定义网络（方便其他服务连接）
+    healthcheck:
+      # 健康检查（确认 MySQL 服务是否启动成功）
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+
+  # Redis服务
+  redis:
+    image: redis:latest
+    # container_name: app-redis
+    command:
+    - redis-server  # Redis启动命令（原配置漏了"-server"）
+    - --requirepass  # 设置密码的参数
+    - redis123       # 密码值
+    - --appendonly   # 开启AOF持久化的参数
+    - yes            # AOF的开关值
+    volumes:
+      - redis_data:/data  # 挂载Redis数据目录（AOF/RDB文件存储在这里）
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]  # 检查Redis是否存活
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+    # 可选：暴露端口到宿主机
+    # ports:
+    #   - "6379:6379"

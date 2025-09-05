@@ -38,7 +38,7 @@ func main() {
 	ch2 := make(chan struct{})
 
 	// 启动第一个goroutine：打印奇数（1,3,5...）
-	wg.Add(1)
+	wg.Add(2)
 	go printNumbers(
 		"奇数",   // 标识名
 		1,      // 起始数字
@@ -50,7 +50,7 @@ func main() {
 	)
 
 	// 启动第二个goroutine：打印偶数（2,4,6...）
-	wg.Add(1)
+	// wg.Add(1)
 	go printNumbers(
 		"偶数",   // 标识名
 		2,      // 起始数字
