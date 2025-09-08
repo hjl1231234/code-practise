@@ -4,6 +4,7 @@
 # Binaries for programs and plugins
 # 忽略调试生成的临时二进制文件
 __debug_bin*
+web-go/blog/blog
 *.exe
 *.log
 *.exe~
