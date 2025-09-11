@@ -98,7 +98,9 @@ func (c *PostController) GetPosts(ctx *gin.Context) {
 	offset := (page - 1) * limit
 
 	var posts []models.Post
-	result := database.DB.Order("created_at DESC").Offset(offset).Limit(limit).Find(&posts)
+	result := database.DB.Preload("User", func(db *gorm.DB) *gorm.DB {
+		return db.Select("id", "username")
+	}).Order("created_at DESC").Offset(offset).Limit(limit).Find(&posts)
 
 	if result.Error != nil {
 		logger.Log.Errorf("获取文章列表失败: %v", result.Error)
