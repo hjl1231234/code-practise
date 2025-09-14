@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 	"web-go/blog/config"
 	"web-go/blog/database"
 	"web-go/blog/models"
 	"web-go/blog/utils"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -107,7 +107,7 @@ func (c *UserController) Login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0,
+		"code": 200,
 		"msg":  "登录成功",
 		"data": gin.H{
 			"token":   token,

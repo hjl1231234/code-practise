@@ -72,7 +72,7 @@ func (c *PostController) CreatePost(ctx *gin.Context) {
 
 	// 返回成功响应
 	ctx.JSON(http.StatusCreated, gin.H{
-		"code": 0,
+		"code": 200,
 		"msg":  "文章创建成功",
 		"data": gin.H{
 			"id":         newPost.ID,
@@ -115,7 +115,7 @@ func (c *PostController) GetPosts(ctx *gin.Context) {
 	database.DB.Model(&models.Post{}).Count(&count)
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0,
+		"code": 200,
 		"msg":  "成功",
 		"data": gin.H{
 			"posts": posts,
@@ -156,7 +156,7 @@ func (c *PostController) GetPost(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0,
+		"code": 200,
 		"msg":  "成功",
 		"data": post,
 	})
@@ -212,7 +212,7 @@ func (c *PostController) UpdatePost(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0,
+		"code": 200,
 		"msg":  "文章更新成功",
 		"data": gin.H{
 			"id":         post.ID,
@@ -258,7 +258,7 @@ func (c *PostController) DeletePost(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code": 0,
+		"code": 200,
 		"msg":  "文章删除成功",
 	})
 }

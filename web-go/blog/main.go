@@ -13,14 +13,18 @@ import (
 )
 
 func main() {
+	// 初始化日志
+	logger.InitLogger(nil)
 	// 加载配置
 	cfg, err := config.LoadConfig(".")
 	if err != nil {
 		// logger.Log.Fatalf("加载配置失败: %v", err)
+		// 这样会有nil指针问题
+		logger.Log.Fatalf("加载配置失败: %v", err)
 		fmt.Printf("加载配置失败: %v", err)
 		return
 	}
-	// logger.Log.Info("配置加载成功")
+	logger.Log.Info("配置加载成功")
 	fmt.Println("配置加载成功")
 
 	logger.InitLogger(&cfg)
