@@ -30,6 +30,7 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 	u.Password = hashedPassword
 	return nil
+
 }
 
 // CheckPassword 验证密码是否正确
