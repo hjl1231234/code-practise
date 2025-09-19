@@ -20,6 +20,8 @@ type Config struct {
 	JWTSecret string `mapstructure:"JWT_SECRET"`
 
 	LogLevel string `mapstructure:"LOG_LEVEL"`
+	// 添加环境标识字段
+	Environment string `mapstructure:"ENVIRONMENT"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
@@ -49,6 +51,11 @@ func LoadConfig(path string) (config Config, err error) {
 
 	if err := viper.Unmarshal(&config); err != nil {
 		return Config{}, fmt.Errorf("配置解析失败: %w", err)
+	}
+
+	// 如果未设置环境，默认为开发环境
+	if config.Environment == "" {
+		config.Environment = "development"
 	}
 
 	return config, nil

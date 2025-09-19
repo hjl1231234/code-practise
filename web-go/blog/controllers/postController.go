@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	"web-go/blog/config"
 	"web-go/blog/database"
 	"web-go/blog/logger"
 	"web-go/blog/middleware"
@@ -15,10 +16,12 @@ import (
 )
 
 type PostController struct {
+	Cfg *config.Config
 }
 
-func NewPostController() *PostController {
-	return &PostController{}
+// 修改NewPostController方法，使其能够接收配置参数
+func NewPostController(cfg *config.Config) *PostController {
+	return &PostController{Cfg: cfg}
 }
 
 // CreatePost 创建文章
@@ -63,10 +66,19 @@ func (c *PostController) CreatePost(ctx *gin.Context) {
 
 	if err := database.DB.Create(&newPost); err.Error != nil {
 		logger.Log.Errorf("创建文章失败: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		
+		// 根据环境返回不同的错误信息
+		response := gin.H{
 			"code": 50001,
 			"msg":  "创建文章失败",
-		})
+		}
+		
+		// 只在开发环境返回详细错误信息
+		if c.Cfg != nil && c.Cfg.Environment == "development" {
+			response["error"] = err.Error.Error()
+		}
+		
+		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
@@ -104,10 +116,19 @@ func (c *PostController) GetPosts(ctx *gin.Context) {
 
 	if result.Error != nil {
 		logger.Log.Errorf("获取文章列表失败: %v", result.Error)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		
+		// 根据环境返回不同的错误信息
+		response := gin.H{
 			"code": 50001,
 			"msg":  "获取文章列表失败",
-		})
+		}
+		
+		// 只在开发环境返回详细错误信息
+		if c.Cfg != nil && c.Cfg.Environment == "development" {
+			response["error"] = result.Error.Error()
+		}
+		
+		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
@@ -148,10 +169,19 @@ func (c *PostController) GetPost(ctx *gin.Context) {
 		}
 
 		logger.Log.Errorf("获取文章详情失败: %v", result.Error)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		
+		// 根据环境返回不同的错误信息
+		response := gin.H{
 			"code": 50002,
 			"msg":  "获取文章详情失败",
-		})
+		}
+		
+		// 只在开发环境返回详细错误信息
+		if c.Cfg != nil && c.Cfg.Environment == "development" {
+			response["error"] = result.Error.Error()
+		}
+		
+		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
@@ -189,7 +219,7 @@ func (c *PostController) UpdatePost(ctx *gin.Context) {
 		Content string `json:"content" binding:"required,min=10"`
 	}
 
-	if err := ctx.ShouldBindJSON(&updateReq); err.Error() == "" {
+	if err := ctx.ShouldBindJSON(&updateReq); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"code":  40001,
 			"msg":   "请求参数无效",
@@ -204,10 +234,19 @@ func (c *PostController) UpdatePost(ctx *gin.Context) {
 	result := database.DB.Save(&post)
 	if result.Error != nil {
 		logger.Log.Errorf("更新文章失败: %v", result.Error)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		
+		// 根据环境返回不同的错误信息
+		response := gin.H{
 			"code": 50005,
 			"msg":  "更新文章失败",
-		})
+		}
+		
+		// 只在开发环境返回详细错误信息
+		if c.Cfg != nil && c.Cfg.Environment == "development" {
+			response["error"] = result.Error.Error()
+		}
+		
+		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
@@ -220,7 +259,6 @@ func (c *PostController) UpdatePost(ctx *gin.Context) {
 			"updated_at": post.UpdatedAt,
 		},
 	})
-
 }
 
 // DeletePost 删除文章
@@ -250,10 +288,19 @@ func (c *PostController) DeletePost(ctx *gin.Context) {
 	result := database.DB.Delete(&post)
 	if result.Error != nil {
 		logger.Log.Errorf("删除文章失败: %v", result.Error)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		
+		// 根据环境返回不同的错误信息
+		response := gin.H{
 			"code": 50008,
 			"msg":  "删除文章失败",
-		})
+		}
+		
+		// 只在开发环境返回详细错误信息
+		if c.Cfg != nil && c.Cfg.Environment == "development" {
+			response["error"] = result.Error.Error()
+		}
+		
+		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 

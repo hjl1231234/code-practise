@@ -11,10 +11,10 @@ import (
 func SetupRoutes(router *gin.Engine, cfg *config.Config) {
 	// 创建控制器实例
 	authController := controllers.NewUserController(cfg)
-	postController := controllers.NewPostController()
+	postController := controllers.NewPostController(cfg) // 传递配置参数
 	commentController := controllers.NewCommentController()
 
-	// ===== 不需要认证的路由 =====
+	// ===== 不需要认证的路程 =====
 	apiPublic := router.Group("/api")
 	{
 		// 用户认证
@@ -27,7 +27,7 @@ func SetupRoutes(router *gin.Engine, cfg *config.Config) {
 		apiPublic.GET("/posts/:id/comments", commentController.GetComments)
 	}
 
-	// ===== 需要认证的路由 =====
+	// ===== 需要认证的路程 =====
 	apiPrivate := apiPublic.Use(middleware.JWTUserMiddleware(cfg))
 	{
 		// 文章管理

@@ -35,82 +35,82 @@ services:
       retries: 5
 
 
-  mysql5:
-    # 使用 MySQL 5 系列最新版本（5.7 分支）
-    image: mysql:5.7
-    container_name: mysql5-service
-    restart: unless-stopped  # 容器退出时自动重启
-    environment:
-      # 必要环境变量（根据需求修改）
-      MYSQL_ROOT_PASSWORD: test123  # root 用户密码
-      MYSQL_DATABASE: my_db  # 初始化时创建的数据库名
-      MYSQL_USER: test  # 自定义用户
-      MYSQL_PASSWORD: test123  # 自定义用户密码
-      # MySQL 5.7 字符集配置（避免中文乱码）
-      MYSQL_INITDB_SKIP_TZINFO: "1"  # 跳过时区初始化（可选）
-    ports:
-      - "3306:3306"  # 端口映射（宿主机:容器）
-    volumes:
-      # 数据持久化（named volume，避免容器删除后数据丢失）
-      - mysql5-data:/var/lib/mysql
-      # 挂载自定义配置文件（可选，如需覆盖默认配置）
-      - ./mysql-conf:/etc/mysql/conf.d
-    networks:
-      - app-network  # 自定义网络（方便其他服务连接）
-    healthcheck:
-      # 健康检查（确认 MySQL 服务是否启动成功）
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # mysql5:
+  #   # 使用 MySQL 5 系列最新版本（5.7 分支）
+  #   image: mysql:5.7
+  #   container_name: mysql5-service
+  #   restart: unless-stopped  # 容器退出时自动重启
+  #   environment:
+  #     # 必要环境变量（根据需求修改）
+  #     MYSQL_ROOT_PASSWORD: test123  # root 用户密码
+  #     MYSQL_DATABASE: my_db  # 初始化时创建的数据库名
+  #     MYSQL_USER: test  # 自定义用户
+  #     MYSQL_PASSWORD: test123  # 自定义用户密码
+  #     # MySQL 5.7 字符集配置（避免中文乱码）
+  #     MYSQL_INITDB_SKIP_TZINFO: "1"  # 跳过时区初始化（可选）
+  #   ports:
+  #     - "3306:3306"  # 端口映射（宿主机:容器）
+  #   volumes:
+  #     # 数据持久化（named volume，避免容器删除后数据丢失）
+  #     - mysql5-data:/var/lib/mysql
+  #     # 挂载自定义配置文件（可选，如需覆盖默认配置）
+  #     - ./mysql-conf:/etc/mysql/conf.d
+  #   networks:
+  #     - app-network  # 自定义网络（方便其他服务连接）
+  #   healthcheck:
+  #     # 健康检查（确认 MySQL 服务是否启动成功）
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
 
 
 
-  # Redis服务
-  redis:
-    image: redis:latest
-    # container_name: app-redis
-    command:
-    - redis-server  # Redis启动命令（原配置漏了"-server"）
-    - --requirepass  # 设置密码的参数
-    - redis123       # 密码值
-    - --appendonly   # 开启AOF持久化的参数
-    - yes            # AOF的开关值
-    volumes:
-      - redis_data:/data  # 挂载Redis数据目录（AOF/RDB文件存储在这里）
-    networks:
-      - app-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "redis123", "ping"]  # 检查Redis是否存活
-      interval: 5s
-      timeout: 3s
-      retries: 3
-    restart: unless-stopped
-    # 可选：暴露端口到宿主机
-    # ports:
-    #   - "6379:6379"
+  # # Redis服务
+  # redis:
+  #   image: redis:latest
+  #   # container_name: app-redis
+  #   command:
+  #   - redis-server  # Redis启动命令（原配置漏了"-server"）
+  #   - --requirepass  # 设置密码的参数
+  #   - redis123       # 密码值
+  #   - --appendonly   # 开启AOF持久化的参数
+  #   - yes            # AOF的开关值
+  #   volumes:
+  #     - redis_data:/data  # 挂载Redis数据目录（AOF/RDB文件存储在这里）
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "-a", "redis123", "ping"]  # 检查Redis是否存活
+  #     interval: 5s
+  #     timeout: 3s
+  #     retries: 3
+  #   restart: unless-stopped
+  #   # 可选：暴露端口到宿主机
+  #   # ports:
+  #   #   - "6379:6379"
 
-  # Nginx稳定版服务
-  nginx:
-    image: nginx:stable  # 使用Nginx稳定版镜像
-    container_name: nginx-service
-    ports:
-      - "80:80"  # 端口映射（宿主机:容器），可根据需要修改
-      - "443:443"  # HTTPS端口映射（可选）
-    volumes:
-      # 挂载自定义配置文件（可选，如需覆盖默认配置）
-      - ./nginx-conf:/etc/nginx/conf.d
-      # 挂载静态文件目录（可选，用于网站内容）
-      - ./nginx-html:/usr/share/nginx/html
-      # 挂载日志目录（可选，便于查看日志）
-      - ./nginx-logs:/var/log/nginx
-    networks:
-      - app-network  # 加入自定义网络，与其他服务通信
-    healthcheck:
-      # 健康检查：验证Nginx服务是否正常运行
-      test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    restart: unless-stopped  # 容器退出时自动重启
+  # # Nginx稳定版服务
+  # nginx:
+  #   image: nginx:stable  # 使用Nginx稳定版镜像
+  #   container_name: nginx-service
+  #   ports:
+  #     - "80:80"  # 端口映射（宿主机:容器），可根据需要修改
+  #     - "443:443"  # HTTPS端口映射（可选）
+  #   volumes:
+  #     # 挂载自定义配置文件（可选，如需覆盖默认配置）
+  #     - ./nginx-conf:/etc/nginx/conf.d
+  #     # 挂载静态文件目录（可选，用于网站内容）
+  #     - ./nginx-html:/usr/share/nginx/html
+  #     # 挂载日志目录（可选，便于查看日志）
+  #     - ./nginx-logs:/var/log/nginx
+  #   networks:
+  #     - app-network  # 加入自定义网络，与其他服务通信
+  #   healthcheck:
+  #     # 健康检查：验证Nginx服务是否正常运行
+  #     test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #   restart: unless-stopped  # 容器退出时自动重启
