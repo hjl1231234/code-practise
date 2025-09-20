@@ -17,6 +17,11 @@ type Config struct {
 	DatabasePassword string `mapstructure:"DATABASE_PASSWORD"`
 	DatabaseName     string `mapstructure:"DATABASE_NAME"`
 
+	// 数据库连接池配置
+	DBMaxOpenConns    int `mapstructure:"DB_MAX_OPEN_CONNS"`
+	DBMaxIdleConns    int `mapstructure:"DB_MAX_IDLE_CONNS"`
+	DBConnMaxLifetime int `mapstructure:"DB_CONN_MAX_LIFETIME_HOURS"` // 单位: 小时
+
 	JWTSecret string `mapstructure:"JWT_SECRET"`
 
 	LogLevel string `mapstructure:"LOG_LEVEL"`
@@ -56,6 +61,17 @@ func LoadConfig(path string) (config Config, err error) {
 	// 如果未设置环境，默认为开发环境
 	if config.Environment == "" {
 		config.Environment = "development"
+	}
+
+	// 设置数据库连接池默认值
+	if config.DBMaxOpenConns <= 0 {
+		config.DBMaxOpenConns = 50
+	}
+	if config.DBMaxIdleConns <= 0 {
+		config.DBMaxIdleConns = 20
+	}
+	if config.DBConnMaxLifetime <= 0 {
+		config.DBConnMaxLifetime = 1
 	}
 
 	return config, nil
